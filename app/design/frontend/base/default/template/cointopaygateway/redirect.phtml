@@ -1,0 +1,224 @@
+<?php
+/**
+ * Copyright © 2018 Cointopay. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<style type="text/css">
+    .cointopay.popup-overlay{
+        visibility:hidden;
+        position: relative;
+        background: #ffffff;
+        width: 90%;
+        z-index: 9;
+    }
+    .popup-overlay.active{
+      visibility:visible;
+      text-align:center;
+    }
+    .cointopay.popup-content {
+      visibility:hidden;
+      border: 1px solid #ccc;
+    }
+    .popup-content.active {
+      visibility:visible;
+    }
+    .cointopay_details {
+      width: 80%;
+      display: inline-block;
+    }
+    .cointopay_details .remaining_amount {
+      width: 100%;
+      float: left;
+      margin-top: 10px;
+      text-align: left;
+    }
+    .cointopay_details .address {
+      width: 100%;
+      float: left;
+      margin-top: 10px;
+      text-align: left;
+    }
+    .cointopay_details .time {
+      width: 100%;
+      float: left;
+      margin-top: 10px;
+      text-align: left;
+    }
+    .cointopay_details .trxid {
+      width: 100%;
+      float: left;
+      margin-top: 10px;
+      text-align: left;
+    }
+    .cointopay_details .description {
+      width:100%;
+      text-align: left;
+      margin-top: 6px;
+      display: inline-block;
+    }
+    .cointopay.popup-overlay, .cointopay.popup-content {
+    	z-index : 99999;
+    	padding : 20px 0px;
+    	height : 50%;
+    	top : 10%;
+    }
+    .scancode {
+      width: 80%;
+      margin: 0 auto;
+      text-align: center;
+      margin-left: 20%;
+  }
+  .loader_img {
+    margin-left: 50%;
+    margin-bottom: 20px;
+  }
+</style>
+<?php
+$order = new Mage_Sales_Model_Order();
+$orderId = Mage::getSingleton('checkout/session')->getLastRealOrderId();
+$order->loadByIncrementId($orderId);
+$coinToPayResponse = Mage::getSingleton('core/session')->getCointopayresponse();
+$coinsResponse = Mage::getSingleton('core/session')->getCoinresponse();
+$decoded = json_decode($coinsResponse);
+?>
+<!-- <form name="cointopaygateway" method="post" action="/checkout/onepage/success/">
+	<input type="hidden" name="orderid" value="<?php echo $orderId; ?>">
+    <input type="hidden" name="grandtotal" value="<?php echo $order->getBaseGrandTotal(); ?>">
+</form>
+<script type="text/javascript">
+	document.cointopaygateway.submit();
+</script> -->
+
+<div class="checkout-success">
+<?php if($order->getIncrementId()) {
+	$payment_gateway_code = $order->getPayment()->getMethodInstance()->getCode(); ?>
+    	<p><?php echo __('Your order number is: <a href="'.$this->getBaseUrl().'sales/order/view/order_id/'.$order->getId().'">'. $order->getIncrementId().'</a>') ?>
+        </p>
+        <?php if ($payment_gateway_code == 'cointopaygateway') { ?>
+            <p><?php echo __('Thank you for your order, please complete the payment below.') ?></p>
+        <?php } else { ?>
+            <p><?php echo __('We\'ll email you an order confirmation with details and tracking info.') ?></p>
+        <?php } ?>
+        
+	    <!-- Cointopay popup Content -->
+        <?php if ($payment_gateway_code == 'cointopaygateway') { ?>
+	        <?php if ($decoded) { ?>
+		        <div class="popup-overlay cointopay active">
+		          	<div class="popup-content cointopay active">    
+                  <img class="loader_img" src="<?php echo $this->getSkinUrl('images/cointopay.gif'); ?>" /> 
+                  <h1> PAYMENT DETAILS </h1>
+                  <div class="scancode">
+			               <img src="<?= $decoded->QRCodeURL ?>" alt="QR Scan Cointopay" />
+			            </div>
+                  <div class="cointopay_details">
+				            <p class="remaining_amount"><strong>Amount:</strong><br>
+                                <?=  $decoded->Amount.' ' ?>
+                                <?= strtoupper($decoded->CoinName).' ' ?>
+                                  <img src="https://s3-eu-west-1.amazonaws.com/cointopay/img/<?= $decoded->CoinName ?>_dash2.png" style="width:20px;float: left;margin: 0px 10px 0 2px;" />
+                              
+				            </p>
+                            <p class="address"><strong>Address: </strong> <br> <input style="width: 100%;" type="text" value="<?= $decoded->coinAddress ?>"> </p>
+				            <p class="time"><strong>Expiry: </strong> <br><span id="expire_time"><?= date("m/d/Y h:i:s T",strtotime("+$decoded->ExpiryTime minutes")) ?></span></p>
+				            <p class="trxid"><strong>Transaction ID: </strong> <br><?= $decoded->TransactionID ?></p>
+				            <p class="description">Make sure to send enough to cover  any coin transaction fees!</p>
+				            <p class="description">Send an equal amount or more.</p>
+				            <?php /* <button class="action primary confirm_payments" id="confirm_payments">Confirm Payments</button> */ ?>
+				            <input type="hidden" id="cointopay_trid" value="<?= $decoded->TransactionID ?>" >
+			            </div>
+		          	</div>
+                <a class="action primary button" style="float: right;margin-top: 15px;" href="<?= $this->getBaseUrl() ?>">Continue Shopping</a>
+            </div>
+		    <?php } ?>
+            <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script> -->
+            <script type="text/javascript">
+                // Update the count down every 1 second
+                // count down time left
+                var d1 = new Date (),
+                d2 = new Date ( d1 );
+                d2.setMinutes ( d1.getMinutes() + <?= $decoded->ExpiryTime ?> );
+                var countDownDate = d2.getTime();
+                var x = setInterval(function() {
+                    if (jQuery('#expire_time').length) {
+                        // Get todays date and time
+                        var now = new Date().getTime();
+                        
+                        // Find the distance between now an the count down date
+                        var distance = countDownDate - now;
+                        
+                        // Time calculations for days, hours, minutes and seconds
+                        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                        
+                        // Output the result in an element with id="expire_time"
+                        document.getElementById("expire_time").innerHTML = days + "d " + hours + "h "
+                        + minutes + "m " + seconds + "s ";
+                        
+                        // If the count down is over, write some text 
+                        if (distance < 0) {
+                            clearInterval(x);
+                            document.getElementById("expire_time").innerHTML = "EXPIRED";
+                        }
+                    }
+                }, 1000);
+                jQuery(function() {
+                    // jQuery = $.noConflict();
+                    interval = setInterval(function() {
+                        if (jQuery('#cointopay_trid').length) {
+                            selected_coin = jQuery('#cointopay_trid').val();
+                            jQuery.ajax ({
+                                url: '/cointopaygateway/checkout/',
+                                showLoader: true,
+                                data: {paymentaction:selected_coin, type:'status'},
+                                type: "POST",
+                                success: function(result) {
+                                    if (result.status == 'paid') {
+                                        jQuery('.popup-content.cointopay').html('<h3>Thank you, your payment is received!</h3>');
+                                    } else if (result.status == 'expired') {
+                                        jQuery('.popup-content.cointopay').html('<h3>Payment time expired!</h3>');
+                                    }
+                                }
+                            });
+                        }
+                    }, 50000);
+                    
+                    // count down time left
+                    var d1 = new Date (),
+                    d2 = new Date ( d1 );
+                    d2.setMinutes ( d1.getMinutes() + <?= $decoded->ExpiryTime ?> );
+                    var countDownDate = d2.getTime();
+
+                    // Update the count down every 1 second
+                    var x = setInterval(function() {
+                        if (jQuery('#expire_time').length) {
+                            // Get todays date and time
+                            var now = new Date().getTime();
+                            
+                            // Find the distance between now an the count down date
+                            var distance = countDownDate - now;
+                            
+                            // Time calculations for days, hours, minutes and seconds
+                            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                            
+                            // Output the result in an element with id="expire_time"
+                            document.getElementById("expire_time").innerHTML = days + "d " + hours + "h "
+                            + minutes + "m " + seconds + "s ";
+                            
+                            // If the count down is over, write some text 
+                            if (distance < 0) {
+                                clearInterval(x);
+                                document.getElementById("expire_time").innerHTML = "EXPIRED";
+                            }
+                        }
+                    }, 1000);
+
+                });
+            </script>
+	    <?php } ?>
+<?php } ?>
+</div>

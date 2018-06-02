@@ -1,0 +1,111 @@
+<?php $_code=$this->getMethodCode() ?>
+<ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none;">
+<li>
+    <h4>Select Crypto Currency:</h4>
+</li>
+<li>
+	<?php $supportedCoins = $this->getInfoData(); ?>
+    <label for="<?php echo $_code ?>_currency_code" class="required"><em>*</em><?php echo $this->__('Select Crypto Currency:') ?></label>
+    <span class="input-box">
+    	<select class="required-entry cointopay_coin_val" id="<?php echo $_code ?>_transaction_result" name="payment[transaction_result]">
+    		<?php
+    			if (count($supportedCoins) > 0) {
+    				foreach ($supportedCoins as $option) { ?>
+    					<option value="<?= $option['value'] ?>"><?= $option['label'] ?></option>
+    		<?php 	}
+    			} 
+    		?>
+    	</select>
+    </span>
+</li>
+</ul>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).on('change', '.cointopay_coin_val', function (event) {
+    event.preventDefault();
+    // selected_coin = document.getElementById('cointopaygateway_transaction_result').value;
+    selected_coin = jQuery('.cointopay_coin_val').val();
+    jQuery.ajax ({
+        url: '/cointopaygateway/checkout/',
+        showLoader: true,
+        data: {paymentaction:selected_coin, type:'order'},
+        type: "POST",
+        success: function(result) {
+            // api response
+            console.log('ssssss');
+            console.log(result);
+            if (result.status == 'error') {
+                jQuery('#dt_method_cointopaygateway').find('.cointopay-error').remove();
+                jQuery('#dt_method_cointopaygateway').append('<div role="alert" class="message message-error error cointopay-error"><div data-ui-id="checkout-cart-validationmessages-message-error cointopay-error" data-bind="text: $data">Checkout Error:'+result.message+'</div></div>');
+                jQuery('#payment-buttons-container').find('.button').hide();
+            } else {
+                jQuery('#dt_method_cointopaygateway').find('.cointopay-error').remove();
+                jQuery('#payment-buttons-container').find('.button').show();
+            }
+        }
+    });
+});
+const paymentMethods = document.getElementsByName("payment[method]");
+interval = setInterval(function() {
+    if (jQuery('.cointopay_coin_val').length && jQuery('#p_method_cointopaygateway').is(':checked')) {
+        selected_coin = jQuery('.cointopay_coin_val').val();
+        jQuery.ajax ({
+            url: '/cointopaygateway/checkout/',
+            showLoader: true,
+            data: {paymentaction:selected_coin, type:'order'},
+            type: "POST",
+            success: function(result) {
+                // api response
+                if (result.status == 'error') {
+                    jQuery('#dt_method_cointopaygateway').find('.cointopay-error').remove();
+                    jQuery('#dt_method_cointopaygateway').append('<div role="alert" class="message message-error error cointopay-error"><div data-ui-id="checkout-cart-validationmessages-message-error cointopay-error" data-bind="text: $data">Checkout Error:'+result.message+'</div></div>');
+                    jQuery('#payment-buttons-container').find('.button').hide();
+                } else {
+                    jQuery('#dt_method_cointopaygateway').find('.cointopay-error').remove();
+                    jQuery('#payment-buttons-container').find('.button').show();
+                }
+            }
+        });
+        clearInterval(interval);
+    }
+}, 1000);
+
+jQuery(paymentMethods).on('change', function () {
+    if (paymentMethods.value != 'cointopaygateway') {
+        jQuery('#dt_method_cointopaygateway').find('.cointopay-error').remove();
+        jQuery('#payment-buttons-container').find('.button').show();
+    }
+});
+
+// confirm order payment status
+$(document).on('click', '#confirm_payments', function (event) {
+    event.preventDefault();
+    transaction_id = $('#cointopay_trid').val();
+    $.ajax ({
+        url: '<?php echo $this->getCoinsPaymentUrl() ?>',
+        showLoader: true,
+        data: {paymentaction:transaction_id, type:'status'},
+        type: "POST",
+        success: function(result) {
+            var cointopay_response = JSON.parse(result);
+            if (cointopay_response[1] == 'paid') {
+                $('#cointo_complete_order').show();
+                $('#cointo_complete_order')[0].click();
+                $(".cointopay.popup-overlay, .cointopay.popup-content").removeClass("active");
+                $(".cointopay-order").hide();
+            } else if (cointopay_response[1] == 'waiting') {
+                alert('Please double check you have successfully transfered payments.');
+            } else if (cointopay_response[1] == 'expired') {
+                alert('Sorry payment time expired now.');
+                window.location.href = window.location.protocol + "//" + window.location.host + "/";
+                return;
+            }
+        }
+    });
+});
+setInterval(function() {
+    if ($('#confirm_payments').length) {
+        $('#confirm_payments')[0].click();
+    }
+}, 300000);
+</script>

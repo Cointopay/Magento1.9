@@ -1,0 +1,8 @@
+<?xml version="1.0"?>   
+<layout>
+    <default>
+    	<reference name="before_body_end">
+		    <block type="core/template" name="cointopaygateway_javascript" template="cointopaygateway/cointopay.phtml"/>
+		</reference>
+    </default>
+</layout>

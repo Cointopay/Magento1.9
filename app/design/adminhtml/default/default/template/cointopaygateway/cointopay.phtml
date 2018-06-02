@@ -1,0 +1,60 @@
+<?php
+/**
+* Copyright © 2018 Cointopay. All rights reserved.
+* See COPYING.txt for license details.
+*/
+?>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script type="text/javascript">
+    jQuery = $.noConflict();
+    jQuery(function() {
+        // on merchant account ID change
+        jQuery('#payment_cointopaygateway_merchant_gateway_id').on('keyup', function () {
+            var merchant_id = jQuery(this).val();
+            var length_id = merchant_id.length;
+            if (length_id > 2) {
+                jQuery.ajax ({
+                    url: '/cointopaygateway/index/',
+                    showLoader: true,
+                    data: {merchant:merchant_id, type:'merchant'},
+                    type: "POST",
+                    success: function(result) {
+                        jQuery('#payment_cointopaygateway_supported_coins').html('');
+                        jQuery('#payment_cointopaygateway_merchant_gateway_id').css('border','1px solid #adadad');
+                        jQuery('.incorrect-merchant').remove();
+                        if (result.length) {
+                            jQuery.each(result, function () {
+                                jQuery('#payment_cointopaygateway_supported_coins').append('<option value="'+this.value+'">'+this.title+'</option>');
+                            });
+                        } else {
+                            jQuery('#payment_cointopaygateway_merchant_gateway_id').css('border','1px solid red');
+                            jQuery('#payment_cointopaygateway_merchant_gateway_id').closest('td').append('<span style="color:red" class="incorrect-merchant">MerchantID should be type Integer, please correct. </span>');
+                        }
+                    }
+                });
+            }
+        });
+
+        // on merchant security code changes
+        jQuery('#payment_cointopaygateway_merchant_gateway_security').on('keyup', function () {
+            var security_code = jQuery(this).val();
+            var length_id = security_code.length;
+            if (length_id > 2) {
+                jQuery.ajax ({
+                    url: '/cointopaygateway/index/',
+                    showLoader: true,
+                    data: {merchant:security_code, type:'security'},
+                    type: "POST",
+                    success: function(result) {
+                        jQuery('#payment_cointopaygateway_merchant_gateway_security').css('border','1px solid #adadad');
+                        jQuery('.incorrect-security').remove();
+                        if (result.status == 'error') {
+                            jQuery('#payment_cointopaygateway_merchant_gateway_security').css('border','1px solid red');
+                            jQuery('#payment_cointopaygateway_merchant_gateway_security').closest('td').append('<span style="color:red" class="incorrect-security">SecurityCode should be type Integer, please correct. </span>');
+                        }
+                    }
+                });
+            }
+        });
+    });
+</script>
