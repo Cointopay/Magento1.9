@@ -1,4 +1,4 @@
-# Official Cointopay Magento 2.x plugin
+# Official Cointopay Magento 1.9 plugin
 Please follow the Magento install instructions mentioned here: download magento documentation or direct link: https://docs.google.com/document/d/1hwf0kMoCFeNQWJGxyRnj7sspiUVtaFHkJ7cMj8hRJx0/edit?usp=sharing
 
 # Support or Contact
