@@ -1,5 +1,5 @@
 # Official Cointopay Magento 1.9 plugin
-Please follow the Magento install instructions mentioned here: download magento documentation or direct link:
+Please follow these Magento install instructions. Download magento zip via the green button above!
 https://github.com/Cointopay/Magento1.9/blob/master/cointopay_magento19_documentationv0.02.pdf
 
 # Support or Contact
