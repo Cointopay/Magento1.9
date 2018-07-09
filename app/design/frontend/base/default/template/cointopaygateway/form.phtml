@@ -4,22 +4,21 @@
     <h4>Select Crypto Currency:</h4>
 </li>
 <li>
-	<?php $supportedCoins = $this->getInfoData(); ?>
+    <?php $supportedCoins = $this->getInfoData(); ?>
     <label for="<?php echo $_code ?>_currency_code" class="required"><em>*</em><?php echo $this->__('Select Crypto Currency:') ?></label>
     <span class="input-box">
-    	<select class="required-entry cointopay_coin_val" id="<?php echo $_code ?>_transaction_result" name="payment[transaction_result]">
-    		<?php
-    			if (count($supportedCoins) > 0) {
-    				foreach ($supportedCoins as $option) { ?>
-    					<option value="<?= $option['value'] ?>"><?= $option['label'] ?></option>
-    		<?php 	}
-    			} 
-    		?>
-    	</select>
+        <select class="required-entry cointopay_coin_val" id="<?php echo $_code ?>_transaction_result" name="payment[transaction_result]">
+            <?php
+                if (count($supportedCoins) > 0) {
+                    foreach ($supportedCoins as $option) { ?>
+                        <option value="<?= $option['value'] ?>"><?= $option['label'] ?></option>
+            <?php   }
+                } 
+            ?>
+        </select>
     </span>
 </li>
 </ul>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script type="text/javascript">
 $(document).on('change', '.cointopay_coin_val', function (event) {
     event.preventDefault();
@@ -32,8 +31,6 @@ $(document).on('change', '.cointopay_coin_val', function (event) {
         type: "POST",
         success: function(result) {
             // api response
-            console.log('ssssss');
-            console.log(result);
             if (result.status == 'error') {
                 jQuery('#dt_method_cointopaygateway').find('.cointopay-error').remove();
                 jQuery('#dt_method_cointopaygateway').append('<div role="alert" class="message message-error error cointopay-error"><div data-ui-id="checkout-cart-validationmessages-message-error cointopay-error" data-bind="text: $data">Checkout Error:'+result.message+'</div></div>');
