@@ -53,7 +53,7 @@ class Cointopay_Paymentgateway_Model_Payment extends Mage_Payment_Model_Method_A
     **/
     private function getSupportedCoins ()
     {
-        $this->_curlUrl = 'https://cointopay.com/CloneMasterTransaction?MerchantID='.$this->merchantId.'&output=json';
+        $this->_curlUrl = 'https://app.cointopay.com/CloneMasterTransaction?MerchantID='.$this->merchantId.'&output=json';
 
         // Specify the POST data
         $fields = array(

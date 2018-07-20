@@ -3,10 +3,14 @@
  * Copyright © 2018 Cointopay. All rights reserved.
  * See COPYING.txt for license details.
  */
+class Cointopay_Paymentgateway_Model_Payment extends Mage_Payment_Model_Method_Abstract {
+    protected $_code = 'cointopaygateway';
+    
+    protected $_isInitializeNeeded      = true;
+    protected $_canUseInternal          = true;
+    protected $_canUseForMultishipping  = false;
 
-class Cointopay_Paymentgateway_Block_Form extends Mage_Payment_Block_Form {
-
-	/**
+    /**
     * @var \Magento\Framework\HTTP\Client\Curl
     */
     protected $_curl;
@@ -31,19 +35,9 @@ class Cointopay_Paymentgateway_Block_Form extends Mage_Payment_Block_Form {
     **/
     protected $storeId;
 
-	protected function _construct()
-	{
-	    parent::_construct();
-	    $this->setTemplate('cointopaygateway/form.phtml');
-	}
-
-	public function getCustomFormBlockType()
-	{
-	    return $this->getMethod()->getConfigData('form_block_type');
-	}
-
-	public function getInfoData($text = NULL) {
-		$this->storeId = Mage::app()->getStore()->getStoreId();
+    public function toOptionArray()
+    {
+        $this->storeId = Mage::app()->getStore()->getStoreId();
         $this->merchantId = Mage::getStoreConfig('payment/cointopaygateway/merchant_gateway_id', $this->storeId);
         if (isset($this->merchantId))
         {
@@ -52,14 +46,14 @@ class Cointopay_Paymentgateway_Block_Form extends Mage_Payment_Block_Form {
         {
             return [];
         }
-	}
+    }
 
-	/**
+    /**
     * @return available coins for merchant
     **/
     private function getSupportedCoins ()
     {
-        $this->_curlUrl = 'https://app.cointopay.com/CloneMasterTransaction?MerchantID='.$this->merchantId.'&output=json';
+        $this->_curlUrl = 'https://cointopay.com/CloneMasterTransaction?MerchantID='.$this->merchantId.'&output=json';
 
         // Specify the POST data
         $fields = array(
@@ -91,3 +85,4 @@ class Cointopay_Paymentgateway_Block_Form extends Mage_Payment_Block_Form {
         return $coins;
     }
 }
+?>
