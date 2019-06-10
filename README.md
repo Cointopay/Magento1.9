@@ -4,6 +4,9 @@
 Please follow these Magento install instructions:
 https://github.com/Cointopay/Magento1.9/blob/master/cointopay_magento19_documentationv0.02.pdf
 
+Support update: In Magent1.9-master/app/code/local/Cointopay/Paymentgateway/Model/Observer.php
+>> please update yourdomain.com to e.g. myshop.com >>transactionconfirmurl=https://yourdomain.com/cointopaygateway/order/&transactionfailurl=https://yourdomain.com/cointopaygateway/order/
+
 # Support or Contact
 Please contact support@cointopay.com for feature requests and/or incidents, or create a ticket here: https://cointopay.freshdesk.com/helpdesk
 
