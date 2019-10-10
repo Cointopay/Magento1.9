@@ -116,7 +116,7 @@ class Cointopay_Paymentgateway_Model_Observer
         $this->merchantId = trim(Mage::getStoreConfig(self::XML_PATH_MERCHANT_ID, $this->storeId));
         $this->securityKey = trim(Mage::getStoreConfig(self::XML_PATH_MERCHANT_SECURITY, $this->storeId));
         $this->currencyCode = Mage::app()->getStore()->getCurrentCurrencyCode();
-        $this->_curlUrl = 'https://cointopay.com/MerchantAPI?Checkout=true&MerchantID='.$this->merchantId.'&Amount='.$this->orderTotal.'&AltCoinID='.$this->coinId.'&CustomerReferenceNr='.$orderId.'&SecurityCode='.$this->securityKey.'&output=json&inputCurrency='.$this->currencyCode.'&transactionconfirmurl=http://magento1.cointopay.com/cointopaygateway/order/&transactionfailurl=http://magento1.cointopay.com/cointopaygateway/order/';
+        $this->_curlUrl = 'https://cointopay.com/MerchantAPI?Checkout=true&MerchantID='.$this->merchantId.'&Amount='.$this->orderTotal.'&AltCoinID='.$this->coinId.'&CustomerReferenceNr='.$orderId.'&SecurityCode='.$this->securityKey.'&output=json&inputCurrency='.$this->currencyCode.'&transactionconfirmurl='.Mage::getBaseUrl().'cointopaygateway/order/&transactionfailurl='.Mage::getBaseUrl().'cointopaygateway/order/';
         $fields = array();
         foreach ($fields as $key => $value) { $fields_string .= $key . '=' . $value . '&'; }
         $fields_string = "";
