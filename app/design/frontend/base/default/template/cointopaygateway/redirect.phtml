@@ -73,6 +73,14 @@
     margin-left: 50%;
     margin-bottom: 20px;
   }
+ .cointopay_details p.trxid img {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.cointopay_details p.trxid br:nth-child(14), .cointopay_details p.trxid br:nth-child(15){
+	display:none;
+}
 </style>
 <?php
 $order = new Mage_Sales_Model_Order();
@@ -122,7 +130,9 @@ $decoded = json_decode($coinsResponse);
 				            <p class="time"><strong>Expiry: </strong> <br><span id="expire_time"><?= date("m/d/Y h:i:s T",strtotime("+$decoded->ExpiryTime minutes")) ?></span></p>
 				            <p class="trxid"><strong>Transaction ID: </strong> <br><?= $decoded->TransactionID ?></p>
 				            <p class="description">Make sure to send enough to cover  any coin transaction fees!</p>
-				            <p class="description">Send an equal amount or more.</p>
+				            <p class="description">Send an equal amount or more.</p><br>
+							<p class="trxid"><strong>Fiat Payment Details: </strong><?= $decoded->PaymentDetail ?></p>
+							<p class="description"> <a target="_blank" href="<?=  $decoded->RedirectURL ?>">View Invoice details</a></p>
 				            <?php /* <button class="action primary confirm_payments" id="confirm_payments">Confirm Payments</button> */ ?>
 				            <input type="hidden" id="cointopay_trid" value="<?= $decoded->TransactionID ?>" >
 			            </div>
